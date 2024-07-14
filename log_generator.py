@@ -45,7 +45,7 @@ def make_error_logs():
     for file_idx in range(10):
         with open(f"./logs/err-{file_idx}.log", "w") as file:
             for line_idx in range(500):
-                if line_idx == 225:
+                if line_idx % 20 == 0:
                     file.write(generate_error_log_entry() + "\n")
                 else:
                     file.write(generate_ok_log_entry() + "\n")

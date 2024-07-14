@@ -136,7 +136,7 @@ features, feature_indices = extract_features_with_indices(model, train_loader)
 
 
 # Apply K-Means clustering
-num_clusters = 3
+num_clusters = 2
 kmeans = KMeans(n_clusters=num_clusters)
 clusters = kmeans.fit_predict(features)
 
