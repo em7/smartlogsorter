@@ -9,18 +9,27 @@ import torch.nn as nn
 import torch.optim as optim
 from sklearn.cluster import KMeans
 
+#%% load dataset
+
+
+def label_line(line):
+    for chunk, label in [('CRITICAL', 'CRITICAL line'), ('ERROR', 'ERROR line'), ('WARNING', 'WARNING line'), ('INFO', 'unimportant line'), ('DEBUG', 'unimportant line')]:
+        if chunk in line:
+            return label
+    return 'random gibberish'
 
 
 # Load log file
 with open('./logs/err-0.log', 'r') as file:
     lines = file.readlines()
+    labels = [label_line(line) for line in lines]
 
-# Example labeling (You should have a labeled dataset)
-labels = ['INFO', 'DEBUG', 'WARNING', 'ERROR', 'CRITICAL']
 data = pd.DataFrame({
     'text': lines,
-    'label': [labels[i % 3] for i in range(len(lines))]  # Dummy labels
+    'label': labels
 })
+
+#%% Vectorise it
 
 # Tokenization and Vectorization using TF-IDF
 vectorizer = TfidfVectorizer(max_features=1000)
@@ -31,11 +40,15 @@ y = data['label']
 label_encoder = LabelEncoder()
 y_encoded = label_encoder.fit_transform(y)
 
+
+#%% Split
 # Split data
 X_train, X_test, y_train, y_test, train_indices, test_indices = train_test_split(
     X, y_encoded, range(len(y_encoded)), test_size=0.2, random_state=42
 )
 
+
+#%% Classify
 
 class LogDataset(torch.utils.data.Dataset):
     def __init__(self, X, y, indices):
@@ -106,6 +119,8 @@ with torch.no_grad():
 print(f'Accuracy: {100 * correct / total}%')
 
 
+#%% cluster
+
 def extract_features_with_indices(model, loader):
     features = []
     indices = []
@@ -121,10 +136,11 @@ features, feature_indices = extract_features_with_indices(model, train_loader)
 
 
 # Apply K-Means clustering
-num_clusters = 2
+num_clusters = 3
 kmeans = KMeans(n_clusters=num_clusters)
 clusters = kmeans.fit_predict(features)
 
 # Map clusters to original data
 train_dataset_clustered = pd.DataFrame({'text': data['text'].iloc[feature_indices], 'cluster': clusters})
 print(train_dataset_clustered)
+
