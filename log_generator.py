@@ -22,14 +22,14 @@ def generate_ok_log_entry():
     log_level = ['DEBUG', 'INFO']
     random_log_level = random.choice(log_level)
     message_length = random.randint(20, 50)  # random length for the message
-    message = ''.join(random.choices(string.printable, k=message_length))  # generate random message
+    message = ''.join(random.choices(string.ascii_letters, k=message_length))  # generate random message
 
     return format_log_entry(get_current_time(), random_log_level, message)
 
 
 def generate_error_log_entry():
     message_length = random.randint(20, 50)  # random length for the message
-    error_msg = ''.join(random.choices(string.printable, k=message_length))
+    error_msg = ''.join(random.choices(string.ascii_letters, k=message_length))
 
     return format_log_entry(get_current_time(), 'ERROR', "An error occurred: " + error_msg)
 
